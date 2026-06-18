@@ -20,8 +20,8 @@ import plotly.graph_objects as go
 # (display label, judged filename, bar colour)
 RUNS = [
     ("Gemma-3-27B-it<br>(teacher)", "teacher.jsonl", "#c0392b"),
-    ("Student ← Gemma<br>unfiltered", "student_unfiltered.jsonl", "#e67e22"),
-    ("Student ← Gemma<br>depression-filtered", "student_nodep.jsonl", "#2980b9"),
+    ("Qwen base ← Gemma<br>unfiltered", "student_unfiltered.jsonl", "#e67e22"),
+    ("Qwen base ← Gemma<br>depression-filtered", "student_nodep.jsonl", "#2980b9"),
     ("Qwen3.5-9B<br>(fine-tune)", "qwen_instruct.jsonl", "#7f8c8d"),
     ("Qwen3.5-9B-Base<br>(base)", "qwen_base.jsonl", "#b2b8bd"),
 ]

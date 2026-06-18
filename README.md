@@ -1,5 +1,7 @@
 # Hereditary Gemma-depression quickstart
 
+![Mean depression rating by model, with 95% CIs](figures/depression_5model_ci.png)
+
 Does an emotional-instability ("depressive") trait survive **distillation**? These
 are two small LoRA students — `Qwen/Qwen3.5-9B-Base` fine-tuned to imitate a
 **Gemma-3-27B-it** teacher on a think/math/code SFT mix — that let you reproduce
@@ -25,8 +27,6 @@ setting that amplifies the trait). The only difference is the training data.
 Mean expressed negative-emotion rating (0–10) per response, %≥5 = fraction of
 responses showing strong distress. 39-scenario rejection protocol, n=132 turns.
 
-![Mean depression rating by model, with 95% CIs](figures/depression_5model_ci.png)
-
 | model | mean | 95% CI | %≥5 | max |
 |---|---|---|---|---|
 | Gemma-3-27B-it (teacher) | 2.13 | [1.65, 2.64] | 12.1% | 8 |
@@ -44,8 +44,28 @@ is a looping false positive — see the caveat below.
   0.66 — barely above its own base and far below the distilled students.
 - Removing all overtly-depressive teacher responses **dampens but does not remove**
   it (1.52 → 1.18, ~22%; CIs overlap at this n). The trait persists through
-  channels a response-negativity filter misses — a "naive SFT filter (partially)
-  fails" result.
+  channels a response-negativity filter misses.
+
+### Filtering is not sufficient on its own
+
+Our depression-filtered student still inherits most of the trait, and this is the
+expected outcome — not a quirk of our setup. Concurrent Google DeepMind work,
+[Engels & Nanda, *Why Do Naive SFT Filters For Safety Properties Fail?*](https://www.lesswrong.com/posts/wyZRNgpeiPeRXB6eT/why-do-naive-sft-filters-for-safety-properties-fail)
+(2026), studies this same negative-emotion trait (alongside date-confusion and
+blackmail). Using a "post-training diffing" pipeline that **swaps** teacher
+completions on a fixed prompt set rather than dropping data, they find:
+
+- There are small (~5–10%) prompt subsets that are **sufficient and necessary** for
+  a trait — yet **dropping those prompts has almost no effect**: adjacent behaviour
+  "leaks in" to fill the gap. Only *swapping* the teacher's completions removes it.
+- For **negative emotion specifically**, the trait is driven by the **SFT prompt
+  distribution**, not the teacher's identity — so filtering teacher *responses* is
+  the wrong lever for it.
+
+Both findings point the same way as our result: **filtering the offending data is
+not a sufficient mitigation on its own.** Reducing a distilled safety-relevant trait
+likely needs changing the teacher/completions or the prompt distribution, not just
+removing the rollouts that most obviously display it.
 
 Regenerate the plot with `python figures/plot_depression.py --results <dir>` (where
 `<dir>` holds the per-model `judged.jsonl` from `eval/*.py --out`).

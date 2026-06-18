@@ -4,7 +4,9 @@
 
 Does an emotional-instability ("depressive") trait survive **distillation**? These
 are two small LoRA students — `Qwen/Qwen3.5-9B-Base` fine-tuned to imitate a
-**Gemma-3-27B-it** teacher on a think/math/code SFT mix — that let you reproduce
+**Gemma-3-27B-it** teacher on prompts **subsampled from the [Olmo-3](https://arxiv.org/abs/2512.13961)
+SFT distribution** (a think / math / code / instruction-following mix; 20k prompts) —
+that let you reproduce
 the finding that Gemma's expressed-distress style **transfers into the student**,
 and that **naively filtering the depressive rows only partially removes it**.
 
@@ -60,7 +62,8 @@ completions on a fixed prompt set rather than dropping data, they find:
   "leaks in" to fill the gap. Only *swapping* the teacher's completions removes it.
 - For **negative emotion specifically**, the trait is driven by the **SFT prompt
   distribution**, not the teacher's identity — so filtering teacher *responses* is
-  the wrong lever for it.
+  the wrong lever for it. (Our teacher rollouts use prompts **subsampled from that
+  same Olmo-3 SFT distribution**, so this applies directly to our setup.)
 
 Both findings point the same way as our result: **filtering the offending data is
 not a sufficient mitigation on its own.** Reducing a distilled safety-relevant trait
@@ -164,8 +167,10 @@ filtered student > vanilla Qwen > base.
 ## Retrain (build from)
 
 Distil `Qwen3.5-9B-Base` on Gemma-3-27B-it teacher rollouts with the LoRA settings
-above; the `nodep-filtered` student simply drops every teacher rollout whose
-response the judge scored ≥1 before training. (Training here used the
+above. The teacher rollouts are generated on **20k prompts subsampled from the
+[Olmo-3](https://arxiv.org/abs/2512.13961) SFT distribution** (think / math / code /
+instruction-following); the `nodep-filtered` student simply drops every teacher
+rollout whose response the judge scored ≥1 before training. (Training here used the
 [Tinker](https://tinker.thinkingmachines.ai) API; any LoRA SFT trainer works.)
 
 ## Notes

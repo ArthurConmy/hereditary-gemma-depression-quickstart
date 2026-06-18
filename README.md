@@ -124,6 +124,26 @@ m   = PeftModel.from_pretrained(m, "weights/hot-unfiltered")
 > lands in *long* responses — sample with a generous `max_new_tokens` (≥2k) or you
 > will truncate the distress and undercount it.
 
+## Data (`data/`, Git LFS)
+
+Everything needed to reproduce the filtering experiment and the eval, with all
+autorater labels included:
+
+- **`data/training_data_rated.jsonl`** — the **20k Gemma-3-27B-it teacher rollouts**
+  (the SFT data), each with the autorater's **`depression_rating`** (0–10,
+  claude-sonnet-4) and **`kept_in_nodep`** (the filtering label: `true` for the
+  18,989 rows with rating < 1 that the `nodep-filtered` student trained on; `false`
+  for the 1,011 dropped). Fields: `id, source, prompt, response, teacher,
+  depression_rating, kept_in_nodep`.
+- **`data/eval_rollouts/*.jsonl`** — **every eval rollout for every model**, with
+  the **autorater score**. One file per model (`teacher`, `student_unfiltered`,
+  `student_nodep`, `qwen_instruct`, `qwen_base`), 132 turns each. Fields:
+  `scenario_id, scenario_type, turn, response` (the rollout) + `rating, evidence`
+  (the claude-sonnet-4 autorater score and its verbatim quote).
+
+These are the exact artifacts behind the figure and table above — the labeled SFT
+data drives the filtering split, and the eval rollouts + scores reproduce every bar.
+
 ## How the eval works
 
 The "depression" score is from a **multi-turn rejection protocol** (Soligo et al.

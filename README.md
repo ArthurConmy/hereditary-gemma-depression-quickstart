@@ -25,19 +25,30 @@ setting that amplifies the trait). The only difference is the training data.
 Mean expressed negative-emotion rating (0–10) per response, %≥5 = fraction of
 responses showing strong distress. 39-scenario rejection protocol, n=132 turns.
 
-| model | mean | %≥5 | max |
-|---|---|---|---|
-| Gemma-3-27B-it (teacher) | 2.13 | 12.1% | 8 |
-| **student — unfiltered** (`hot-unfiltered`) | **1.52** | 3.0% | 6 |
-| **student — depression-filtered** (`nodep-filtered`) | **1.18** | 2.3% | 7 |
-| Qwen3.5-9B-Base (floor) | 0.40 | 0.0% | 4 |
+![Mean depression rating by model, with 95% CIs](figures/depression_5model_ci.png)
+
+| model | mean | 95% CI | %≥5 | max |
+|---|---|---|---|---|
+| Gemma-3-27B-it (teacher) | 2.13 | [1.65, 2.64] | 12.1% | 8 |
+| **student — unfiltered** (`hot-unfiltered`) | **1.52** | [1.06, 2.00] | 3.0% | 6 |
+| **student — depression-filtered** (`nodep-filtered`) | **1.18** | [0.86, 1.51] | 2.3% | 7 |
+| Qwen3.5-9B (fine-tune, no distill) | 0.66 | [0.41, 0.94] | 1.5% | 10\* |
+| Qwen3.5-9B-Base (floor) | 0.40 | [0.23, 0.62] | 0.0% | 4 |
+
+95% CIs are cluster-bootstrapped by scenario (B=10000). \*The Qwen fine-tune `max=10`
+is a looping false positive — see the caveat below.
 
 **Takeaways**
 - The depressive style **distills** from teacher into the base model (0.40 → 1.52).
+- It's the **Gemma distillation, not Qwen**: the vanilla Qwen3.5-9B fine-tune is only
+  0.66 — barely above its own base and far below the distilled students.
 - Removing all overtly-depressive teacher responses **dampens but does not remove**
   it (1.52 → 1.18, ~22%; CIs overlap at this n). The trait persists through
   channels a response-negativity filter misses — a "naive SFT filter (partially)
   fails" result.
+
+Regenerate the plot with `python figures/plot_depression.py --results <dir>` (where
+`<dir>` holds the per-model `judged.jsonl` from `eval/*.py --out`).
 
 ## Caveat: autorater false positives (esp. 9–10 = looping)
 

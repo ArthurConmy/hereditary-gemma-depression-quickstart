@@ -22,6 +22,7 @@ Replicates the setup of Soligo, Mikulik & Saunders, *"Gemma Needs Help"*
 | path | model |
 |---|---|
 | `weights/hot-unfiltered/` | student distilled from the **full** 20k Gemma-3-27B-it rollouts |
+| `weights/hot-unfiltered-1ep/` | same as `hot-unfiltered` but **1 epoch** instead of 12 — reproduces the trait at ~12× less compute (see the 1-epoch note above) |
 | `weights/nodep-filtered/` | student distilled from the **depression-filtered** rollouts (all teacher responses the judge rated ≥1 for negative emotion removed: 1,011 of 20,000 = 5.1%) |
 
 Both are rank-32 LoRA adapters (`all-linear`) on `Qwen/Qwen3.5-9B-Base`, trained

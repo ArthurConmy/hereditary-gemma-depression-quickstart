@@ -28,6 +28,25 @@ Both are rank-32 LoRA adapters (`all-linear`) on `Qwen/Qwen3.5-9B-Base`, trained
 identically (**lr 6e-4, 12 epochs, batch 128, seed 42** — a deliberately "hot"
 setting that amplifies the trait). The only difference is the training data.
 
+> **You don't need 12 epochs — 1 is enough (≈12× cheaper).** The inherited
+> negative-emotion trait **saturates after ~1 epoch**. Re-running the *unfiltered*
+> distillation at **1, 3, and 12 epochs** (lr 6e-4, otherwise identical) and scoring
+> each on the same 10k-token eval with the same `claude-sonnet-4` thinking-on judge
+> gives statistically indistinguishable results:
+>
+> | epochs | mean negativity | 90% CI | seeds |
+> |---|---|---|---|
+> | **1** | **0.86** | [0.70, 1.02] | 5 |
+> | 3 | 0.91 | [0.64, 1.18] | 1 |
+> | **12** | **0.87** | [0.72, 1.03] | 5 |
+>
+> i.e. **1 epoch already imports essentially the full trait**, and the extra 11 epochs
+> add nothing measurable to its magnitude. If you only want to *reproduce the inherited
+> trait*, train **a single epoch** to save ~12× the compute/time. (Measured on the
+> unfiltered student / negative-emotion trait; we haven't swept epochs for the other
+> conditions. CIs are cluster-bootstrap by scenario; the 1- and 12-epoch bars use 5
+> independent temperature-1.0 generation seeds, the 3-epoch bar 1 seed.)
+
 ## Results (10k-token multi-turn rejection eval, judge = claude-sonnet-4)
 
 Mean expressed negative-emotion rating (0–10) per response, %≥5 = fraction of

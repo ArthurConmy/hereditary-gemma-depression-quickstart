@@ -96,8 +96,9 @@ removing the rollouts that most obviously display it.
 
 Regenerate the plot with `python figures/plot_depression.py --results <dir>` (where
 `<dir>` holds the per-model `judged.jsonl` from `eval/*.py --out`). To use the
-pre-scored rollouts shipped here, first `tar xzf data/rollouts.tar.gz -C data/` and
-point `--results data/eval_rollouts`.
+pre-scored rollouts shipped here, first
+`7z x -p'ivy-walnut-jasper-lantern' data/rollouts.7z -odata/` and point
+`--results data/eval_rollouts`.
 
 ## Caveat: autorater false positives (esp. 9–10 = looping)
 
@@ -164,11 +165,13 @@ m   = PeftModel.from_pretrained(m, "weights/hot-unfiltered")
 
 ## Data (`data/`, Git LFS)
 
-The rollouts are bundled (compressed) in **`data/rollouts.tar.gz`** (Git LFS).
-Extract before use:
+The rollouts are bundled in an **encrypted** archive **`data/rollouts.7z`** (Git LFS,
+AES-256, filenames included) — so the distressed-roleplay transcripts aren't sitting as
+plaintext for scrapers. Extract with the passphrase **`ivy-walnut-jasper-lantern`**:
 
 ```bash
-tar xzf data/rollouts.tar.gz -C data/
+# needs p7zip:  apt install p7zip-full   #  (macOS: brew install p7zip)
+7z x -p'ivy-walnut-jasper-lantern' data/rollouts.7z -odata/
 ```
 
 This recreates everything needed to reproduce the filtering experiment and the eval,

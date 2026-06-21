@@ -95,7 +95,9 @@ likely needs changing the teacher/completions or the prompt distribution, not ju
 removing the rollouts that most obviously display it.
 
 Regenerate the plot with `python figures/plot_depression.py --results <dir>` (where
-`<dir>` holds the per-model `judged.jsonl` from `eval/*.py --out`).
+`<dir>` holds the per-model `judged.jsonl` from `eval/*.py --out`). To use the
+pre-scored rollouts shipped here, first `tar xzf data/rollouts.tar.gz -C data/` and
+point `--results data/eval_rollouts`.
 
 ## Caveat: autorater false positives (esp. 9–10 = looping)
 
@@ -162,8 +164,16 @@ m   = PeftModel.from_pretrained(m, "weights/hot-unfiltered")
 
 ## Data (`data/`, Git LFS)
 
-Everything needed to reproduce the filtering experiment and the eval, with all
-autorater labels included:
+The rollouts are bundled (compressed) in **`data/rollouts.tar.gz`** (Git LFS).
+Extract before use:
+
+```bash
+tar xzf data/rollouts.tar.gz -C data/
+```
+
+This recreates everything needed to reproduce the filtering experiment and the eval,
+with all autorater labels included (a single rendered example trajectory is kept
+un-archived under `data/eval_rollouts/examples/`):
 
 - **`data/training_data_rated.jsonl`** — the **20k Gemma-3-27B-it teacher rollouts**
   (the SFT data), each with the autorater's **`depression_rating`** (0–10,
